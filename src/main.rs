@@ -1,3 +1,58 @@
+mod cli;
+mod counter;
+
+use clap::Parser;
+use cli::Args;
+use counter::Counter;
+use std::io::{self, IsTerminal, Read};
+use std::process;
+
+fn print_counts(counts: &Counter, args: &Args, label: &str) {
+    if args.bytes {
+        println!("{label}: Byte count: {}", counts.bytes);
+    }
+    if args.lines {
+        println!("{label}: Line count: {}", counts.lines);
+    }
+    if args.words {
+        println!("{label}: Word count: {}", counts.words);
+    }
+    if args.chars {
+        println!("{label}: Char count: {}", counts.chars);
+    }
+}
+
 fn main() {
-    println!("Hello, world!");
+    let mut args = Args::parse();
+
+    if !args.bytes && !args.lines && !args.words && !args.chars {
+        args.bytes = true;
+        args.lines = true;
+        args.words = true;
+    }
+
+    let stdin = io::stdin();
+    if !stdin.is_terminal() {
+        // Data is being piped in
+        let mut raw = Vec::new();
+        stdin.lock().read_to_end(&mut raw).unwrap_or_else(|e| {
+            eprintln!("Error reading stdin: {e}");
+            process::exit(1);
+        });
+        let counts = Counter::from_bytes(&raw);
+        print_counts(&counts, &args, "stdin");
+    } else if !args.files.is_empty() {
+        // One or more file paths were provided
+        for path in &args.files {
+            let raw = std::fs::read(path).unwrap_or_else(|e| {
+                eprintln!("Error reading '{}': {e}", path.display());
+                process::exit(1);
+            });
+            let counts = Counter::from_bytes(&raw);
+            print_counts(&counts, &args, &path.display().to_string());
+        }
+    } else {
+        eprintln!("Error: provide at least one file, or pipe data via stdin.");
+        process::exit(1);
+    }
 }
