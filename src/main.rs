@@ -4,7 +4,8 @@ mod counter;
 use clap::Parser;
 use cli::Args;
 use counter::Counter;
-use std::io::{self, IsTerminal, Read};
+use std::fs::File;
+use std::io::{self, IsTerminal};
 use std::process;
 
 fn print_counts(counter: &Counter, args: &Args, label: &str) {
@@ -33,22 +34,21 @@ fn main() {
 
     let stdin = io::stdin();
     if !stdin.is_terminal() {
-        // Data is being piped in
-        let mut raw = Vec::new();
-        stdin.lock().read_to_end(&mut raw).unwrap_or_else(|e| {
+        let counter = Counter::from_reader(stdin.lock()).unwrap_or_else(|e| {
             eprintln!("Error reading stdin: {e}");
             process::exit(1);
         });
-        let counter = Counter::from_bytes(&raw);
         print_counts(&counter, &args, "stdin");
     } else if !args.files.is_empty() {
-        // One or more file paths were provided
         for path in &args.files {
-            let raw = std::fs::read(path).unwrap_or_else(|e| {
+            let file = File::open(path).unwrap_or_else(|e| {
                 eprintln!("Error reading '{}': {e}", path.display());
                 process::exit(1);
             });
-            let counter = Counter::from_bytes(&raw);
+            let counter = Counter::from_reader(file).unwrap_or_else(|e| {
+                eprintln!("Error reading '{}': {e}", path.display());
+                process::exit(1);
+            });
             print_counts(&counter, &args, &path.display().to_string());
         }
     } else {
