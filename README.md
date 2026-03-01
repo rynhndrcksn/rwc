@@ -61,4 +61,4 @@ If you see a problem or improvement that can be made, please open up an issue to
 
 ## License
 
-Copyright© 2026 Ryan Hendrickson. Released under the MIT License. See [ICENSE](LICENSE) for details.
+Copyright© 2026 Ryan Hendrickson. Released under the MIT License. See [LICENSE](LICENSE) for details.

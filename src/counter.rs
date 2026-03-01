@@ -25,6 +25,11 @@ impl Counter {
             chars += line.chars().count() + 1;
         }
 
-        Ok(Self { bytes, lines, words, chars })
+        Ok(Self {
+            bytes,
+            lines,
+            words,
+            chars,
+        })
     }
 }
