@@ -6,7 +6,7 @@ use std::path::PathBuf;
 pub struct Args {
     pub files: Vec<PathBuf>,
 
-    #[arg(short, long)]
+    #[arg(short = 'c', long)]
     pub bytes: bool,
 
     #[arg(short, long)]
@@ -15,6 +15,6 @@ pub struct Args {
     #[arg(short, long)]
     pub words: bool,
 
-    #[arg(short, long)]
+    #[arg(short = 'm', long)]
     pub chars: bool,
 }
