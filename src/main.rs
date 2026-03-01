@@ -7,18 +7,18 @@ use counter::Counter;
 use std::io::{self, IsTerminal, Read};
 use std::process;
 
-fn print_counts(counts: &Counter, args: &Args, label: &str) {
+fn print_counts(counter: &Counter, args: &Args, label: &str) {
     if args.bytes {
-        println!("{label}: Byte count: {}", counts.bytes);
+        println!("{label}: Byte count: {}", counter.bytes);
     }
     if args.lines {
-        println!("{label}: Line count: {}", counts.lines);
+        println!("{label}: Line count: {}", counter.lines);
     }
     if args.words {
-        println!("{label}: Word count: {}", counts.words);
+        println!("{label}: Word count: {}", counter.words);
     }
     if args.chars {
-        println!("{label}: Char count: {}", counts.chars);
+        println!("{label}: Char count: {}", counter.chars);
     }
 }
 
@@ -39,8 +39,8 @@ fn main() {
             eprintln!("Error reading stdin: {e}");
             process::exit(1);
         });
-        let counts = Counter::from_bytes(&raw);
-        print_counts(&counts, &args, "stdin");
+        let counter = Counter::from_bytes(&raw);
+        print_counts(&counter, &args, "stdin");
     } else if !args.files.is_empty() {
         // One or more file paths were provided
         for path in &args.files {
@@ -48,8 +48,8 @@ fn main() {
                 eprintln!("Error reading '{}': {e}", path.display());
                 process::exit(1);
             });
-            let counts = Counter::from_bytes(&raw);
-            print_counts(&counts, &args, &path.display().to_string());
+            let counter = Counter::from_bytes(&raw);
+            print_counts(&counter, &args, &path.display().to_string());
         }
     } else {
         eprintln!("Error: provide at least one file, or pipe data via stdin.");
